@@ -3,6 +3,9 @@ import { gsap, calm } from '../lib/motion'
 import { stage } from '../lib/stage'
 import { viewW } from '../lib/shapes'
 
+/** Seconds the still holds over a started clip, which is how long YouTube shows its start-up overlay. */
+const LEAD_IN = 3
+
 interface Moment { id: string; start: number; end: number; year: string; title: string; sub: string; line: string; was?: string; now?: string; tint: string; channel: string }
 /* Start and end seconds were read off each clip's YouTube storyboard. Every id was played from the live origin: some owners block embeds even when YouTube reports them as embeddable. */
 export const MOMENTS: Moment[] = [
@@ -63,25 +66,31 @@ function Scene({ m, n }: { m: Moment; n: number }) {
       gsap.fromTo(frame.current, { scale: 0.86, y: 30 }, { scale: 1, y: 0, duration: 0.9, ease: 'expo.out' })
     }
     if (calm()) return
-    let dead = false, tried = false
+    let dead = false, tried = false, reveal = 0
+    const from = Math.max(0, m.start - LEAD_IN)
+    // Loop just before the end, so YouTube's replay button and end screen never appear.
+    const loop = window.setInterval(() => {
+      const p = player.current
+      if (p?.getCurrentTime && p.getCurrentTime() >= m.end - 0.4) p.seekTo(from, true)
+    }, 250)
     const host = document.createElement('div')
     frame.current!.querySelector('.film-host')!.appendChild(host)
     loadYT().then((YT) => {
       if (dead) return
       player.current = new YT.Player(host, {
         videoId: m.id, width: '100%', height: '100%',
-        playerVars: { autoplay: 1, mute: 1, controls: 0, playsinline: 1, rel: 0, modestbranding: 1, start: m.start, end: m.end, fs: 0, iv_load_policy: 3, cc_load_policy: 0 },
+        playerVars: { autoplay: 1, mute: 1, controls: 0, disablekb: 1, playsinline: 1, rel: 0, modestbranding: 1, start: from, fs: 0, iv_load_policy: 3, cc_load_policy: 0 },
         events: {
           onReady: (e: any) => { soundOn ? e.target.unMute() : e.target.mute(); e.target.playVideo() },
-          onError: (e: any) => { if (!tried) { tried = true; setTimeout(() => { if (!dead) e.target.loadVideoById({ videoId: m.id, startSeconds: m.start, endSeconds: m.end }) }, 1200) } },
+          onError: (e: any) => { if (!tried) { tried = true; setTimeout(() => { if (!dead) e.target.loadVideoById({ videoId: m.id, startSeconds: from }) }, 1200) } },
           onStateChange: (e: any) => {
-            if (e.data === YT.PlayerState.PLAYING) setPlaying(true)
-            if (e.data === YT.PlayerState.ENDED) { e.target.seekTo(m.start, true); e.target.playVideo() }
+            if (e.data === YT.PlayerState.PLAYING && !reveal) reveal = window.setTimeout(() => setPlaying(true), LEAD_IN * 1000)
+            if (e.data === YT.PlayerState.ENDED) { e.target.seekTo(from, true); e.target.playVideo() }
           },
         },
       })
     })
-    return () => { dead = true; setPlaying(false); try { player.current?.destroy() } catch { /* already gone */ } player.current = null; frame.current?.querySelector('.film-host')?.replaceChildren() }
+    return () => { dead = true; clearInterval(loop); clearTimeout(reveal); setPlaying(false); try { player.current?.destroy() } catch { /* already gone */ } player.current = null; frame.current?.querySelector('.film-host')?.replaceChildren() }
   }, [on])
   useEffect(() => { const p = player.current; if (p?.unMute) { if (sound) p.unMute(); else p.mute() } }, [sound])
 
@@ -96,7 +105,6 @@ function Scene({ m, n }: { m: Moment; n: number }) {
         <div className="film-frame" ref={frame}>
           <img src={`https://i.ytimg.com/vi/${m.id}/hqdefault.jpg`} alt="" loading="lazy" className={playing ? 'gone' : ''} />
           <div className="film-host" />
-          {!playing && <a className="film-play" href={watch} target="_blank" rel="noreferrer" aria-label={`Watch ${m.title} on YouTube`}><svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z" /></svg></a>}
         </div>
         <footer className="film-foot">
           <p className="film-line">{m.line}</p>
