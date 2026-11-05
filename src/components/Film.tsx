@@ -49,7 +49,9 @@ function Scene({ m, n }: { m: Moment; n: number }) {
 
   useEffect(() => { listeners.add(setS); return () => { listeners.delete(setS) } }, [])
   useEffect(() => {
-    const io = new IntersectionObserver(([e]) => setOn(e.isIntersecting), { threshold: 0.55 })
+    // Phones stack scenes, so only the one crossing the middle of the screen plays.
+    const stacked = innerWidth <= 640
+    const io = new IntersectionObserver(([e]) => setOn(e.isIntersecting), stacked ? { rootMargin: '-42% 0px -42% 0px', threshold: 0 } : { threshold: 0.55 })
     io.observe(frame.current!)
     return () => io.disconnect()
   }, [])

@@ -6,7 +6,7 @@ import { useScene } from './Bits'
 export function Verdict() {
   const sec = useRef<HTMLDivElement>(null)
   const [busy, setBusy] = useState(false)
-  const shape = () => { const W = viewW(); return bothDigits({ ronaldo: [W * 0.27, innerHeight * 0.3], messi: [W * 0.73, innerHeight * 0.3] }, W * 0.42) }
+  const shape = () => { const W = viewW(); return bothDigits({ ronaldo: [W * 0.27, innerHeight * 0.3], messi: [W * 0.73, innerHeight * 0.3] }, Math.min(W * 0.42, innerHeight * 0.62)) }
   useScene(sec, 'verdict', shape, { start: 'top 65%', end: 'bottom 35%' })
   const siu = () => {
     if (busy) return

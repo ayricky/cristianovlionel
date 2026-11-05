@@ -11,7 +11,7 @@ export function Act({ word, id }: { word: string; id: string }) {
     const key = `act-${id}`
     const make = () => words(word, viewW() * 0.92, viewW() / 2, innerHeight * 0.5)
     const st = ScrollTrigger.create({
-      trigger: root.current, start: 'top 30%', end: 'bottom 70%',
+      trigger: root.current, start: 'top 62%', end: 'bottom 38%',
       onToggle: (s) => {
         if (s.isActive) { stage.enter(key, make, 1.3); setTimeout(() => stage.field?.shock(viewW() / 2, innerHeight / 2), 950) } else stage.leave(key)
       },
