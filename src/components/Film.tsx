@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { gsap, calm } from '../lib/motion'
 import { stage } from '../lib/stage'
 import { viewW } from '../lib/shapes'
+import { sound } from '../lib/sound'
 
 /** Seconds the still holds over a started clip, which is how long YouTube shows its start-up overlay. */
 const LEAD_IN = 3
@@ -36,21 +37,26 @@ function loadYT() {
   return api
 }
 
-/* One sound setting for the whole film. */
-let soundOn = false
-const listeners = new Set<(v: boolean) => void>()
-const setSound = (v: boolean) => { soundOn = v; listeners.forEach((f) => f(v)) }
-
 function Scene({ m, n }: { m: Moment; n: number }) {
   const root = useRef<HTMLElement>(null)
   const frame = useRef<HTMLDivElement>(null)
   const player = useRef<any>(null)
   const [on, setOn] = useState(false)
   const [playing, setPlaying] = useState(false)
-  const [sound, setS] = useState(soundOn)
+  const [audible, setAudible] = useState(sound.on)
+  const [flip, setFlip] = useState(false)
   const fired = useRef(false)
 
-  useEffect(() => { listeners.add(setS); return () => { listeners.delete(setS) } }, [])
+  useEffect(() => sound.subscribe(setAudible), [])
+  // While a clip plays, the colour drains and the score turns over: the same moment, without him.
+  useEffect(() => {
+    if (!playing || !m.was) return
+    let off = 0
+    const cycle = () => { setFlip(true); off = window.setTimeout(() => setFlip(false), 3200) }
+    const every = window.setInterval(cycle, 10000)
+    const first = window.setTimeout(cycle, 4500)
+    return () => { clearInterval(every); clearTimeout(first); clearTimeout(off); setFlip(false) }
+  }, [playing])
   useEffect(() => {
     // Phones stack scenes, so only the one crossing the middle of the screen plays.
     const stacked = innerWidth <= 640
@@ -63,6 +69,7 @@ function Scene({ m, n }: { m: Moment; n: number }) {
     if (!fired.current && !calm()) {
       fired.current = true
       stage.field?.shock(viewW() / 2, innerHeight / 2)
+      sound.whistle()
       gsap.fromTo(frame.current, { scale: 0.86, y: 30 }, { scale: 1, y: 0, duration: 0.9, ease: 'expo.out' })
     }
     if (calm()) return
@@ -81,7 +88,7 @@ function Scene({ m, n }: { m: Moment; n: number }) {
         videoId: m.id, width: '100%', height: '100%',
         playerVars: { autoplay: 1, mute: 1, controls: 0, disablekb: 1, playsinline: 1, rel: 0, modestbranding: 1, start: from, fs: 0, iv_load_policy: 3, cc_load_policy: 0 },
         events: {
-          onReady: (e: any) => { soundOn ? e.target.unMute() : e.target.mute(); e.target.playVideo() },
+          onReady: (e: any) => { sound.on ? e.target.unMute() : e.target.mute(); e.target.playVideo() },
           onError: (e: any) => { if (!tried) { tried = true; setTimeout(() => { if (!dead) e.target.loadVideoById({ videoId: m.id, startSeconds: from }) }, 1200) } },
           onStateChange: (e: any) => {
             if (e.data === YT.PlayerState.PLAYING && !reveal) reveal = window.setTimeout(() => setPlaying(true), LEAD_IN * 1000)
@@ -92,11 +99,16 @@ function Scene({ m, n }: { m: Moment; n: number }) {
     })
     return () => { dead = true; clearInterval(loop); clearTimeout(reveal); setPlaying(false); try { player.current?.destroy() } catch { /* already gone */ } player.current = null; frame.current?.querySelector('.film-host')?.replaceChildren() }
   }, [on])
-  useEffect(() => { const p = player.current; if (p?.unMute) { if (sound) p.unMute(); else p.mute() } }, [sound])
+  useEffect(() => {
+    const p = player.current
+    if (p?.unMute) { if (audible) p.unMute(); else p.mute() }
+    if (on) sound.duck(audible)
+    return () => { if (on) sound.duck(false) }
+  }, [audible, on])
 
   const watch = `https://www.youtube.com/watch?v=${m.id}&t=${m.start}s`
   return (
-    <section ref={root} className={`film ${on ? 'on' : ''}`} style={{ '--tint': m.tint } as React.CSSProperties} aria-label={`${m.title} ${m.year}`}>
+    <section ref={root} className={`film ${on ? 'on' : ''} ${flip ? 'flip' : ''}`} style={{ '--tint': m.tint } as React.CSSProperties} aria-label={`${m.title} ${m.year}`}>
       <div className="film-stage">
         <header className="film-head">
           <p><b>{m.year}</b> {m.sub}</p>
@@ -110,7 +122,7 @@ function Scene({ m, n }: { m: Moment; n: number }) {
           <p className="film-line">{m.line}</p>
           {m.was && <p className="film-swap"><span>Without him</span><b>{m.was}</b><i>to</i><s>{m.now}</s></p>}
           <div className="film-meta">
-            <button onClick={() => setSound(!sound)} aria-pressed={sound}>{sound ? 'Sound on' : 'Sound off'}</button>
+            <button onClick={() => sound.toggle()} aria-pressed={audible}>{audible ? 'Sound on' : 'Sound off'}</button>
             <a href={watch} target="_blank" rel="noreferrer">{m.channel} on YouTube</a>
             <span>{n}/{MOMENTS.length}</span>
           </div>

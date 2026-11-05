@@ -23,6 +23,9 @@ import { Method } from './components/Method'
 import { Nav } from './components/Nav'
 import { GoalTip } from './components/GoalTip'
 import { Padding } from './components/Padding'
+import { Poster } from './components/Poster'
+import { Legend } from './components/Legend'
+import { Gaps } from './components/Gaps'
 import { Numbers } from './components/Numbers'
 
 export function App() {
@@ -50,22 +53,30 @@ export function App() {
       <main>
         <Hero />
         <Case />
+        <Poster img="/img/p-united.jpg" big="Ballon d'Or at 23" sub="Manchester United" alt="Ronaldo celebrating a goal for Manchester United" focus="50% 20%" />
         <Wall />
         <Cabinet />
+        <Poster img="/img/p-trophy.jpg" big="Five Champions Leagues" sub="Three in a row, 2016 to 2018" alt="Ronaldo with his Real Madrid team-mates at the 2018 Champions League reception in Madrid" focus="44% 30%" />
+        <Legend />
         <Act id="biggest" word="BIG GAMES" />
         <Biggest />
         <Act id="goals" word="THE GOALS" />
         <Film />
-        <Act id="decisive" word="DECISIVE" />
         <Clutch />
+        <Poster img="/img/p-slide.jpg" big="450 in 438" sub="Goals for Real Madrid" alt="Ronaldo on his knees celebrating a Real Madrid goal against Ludogorets in 2014" focus="60% 40%" />
         <Act id="padded" word="PADDED" />
         <Padding />
+        <Act id="gaps-act" word="THE GAPS" />
+        <Gaps />
         <Act id="complete" word="COMPLETE" />
         <Feet />
         <PitchMap />
+        <Poster img="/img/p-strike.jpg" big="Six World Cups" sub="The only man to score at six" alt="Ronaldo striking the ball for Portugal at the 2018 World Cup" focus="60% 30%" />
         <Ages />
+        <Poster img="/img/p-lisbon.jpg" big="Euro 2016" sub="Portugal's first major trophy" alt="Portuguese fans watching Euro 2016 on giant screens in Lisbon" focus="50% 40%" />
         <Country />
         <Cross />
+        <Poster img="/img/p-arms.jpg" big="Still scoring at 41" sub="15 goals from 1,000" alt="Ronaldo celebrating a goal for Portugal in Yerevan in 2025" focus="55% 25%" />
         <Verdict />
         <Numbers />
         <Method />

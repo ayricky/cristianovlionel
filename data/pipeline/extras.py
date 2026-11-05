@@ -196,11 +196,35 @@ def big(p, ms, gs, T):
                 koHats=sum(1 for m in ms if m['competition'] == 'Champions League' and m['round'] in KO and m['goals'] >= 3), koLate=sum(1 for g in gs if ucl(g) and g['min'] >= 80 and g['state'] in (0, -1)), koWinners=sum(1 for g in gs if ucl(g) and g['winner']),
                 semisFinals=dict(goals=sum(m['goals'] for m in late), apps=len(late)), intlTop10=comp('vs Top 10 Competitive'), intlTop5=comp('vs Top 5 Competitive'), giants=giants)
 
+def gaps(p, ms):
+    """The record's holes, measured the same way for both."""
+    nat = 'Portugal' if p == 'ronaldo' else 'Argentina'
+    fin = [m for m in ms if m['team'] == nat and m['round'] == 'F']
+    def won(m):
+        if m['penScore']:
+            a, b = map(int, m['penScore'].split('-'))
+            return a > b
+        return m['scoreTeam'] > m['scoreOpponent']
+    lost = [m for m in fin if not won(m)]
+    qf = [m for m in ms if m['competition'] == 'Champions League' and m['round'] == 'QF']
+    run = best = 0
+    for m in qf:
+        run = 0 if m['goals'] else run + 1
+        best = max(best, run)
+    club = {}
+    for m in ms:
+        if m['team'] in ('Portugal', 'Argentina'):
+            continue
+        c = club.setdefault(m['team'], [0, 0])
+        c[0] += m['goals']; c[1] += 1
+    return dict(natFinals=len(fin), natFinalsLost=len(lost), natLostGoals=sum(m['goals'] for m in lost), natFinalGoals=sum(m['goals'] for m in fin), qfDrought=best, qfGames=len(qf), qfGoals=sum(m['goals'] for m in qf),
+                wcPensMissed=sum(m['pensMissed'] for m in ms if m['competition'] == 'World Cup'), penPct=round(sum(m['pens'] for m in ms) / (sum(m['pens'] for m in ms) + sum(m['pensMissed'] for m in ms)) * 100), clubs=club)
+
 def extras(p, ms, gs, anatomy, T):
     sh, sm = shots(p, ms, gs)
     pf, pad = padding(ms, gs)
     pf = [f + (32 if g['winner'] else 0) + (64 if g['state'] <= 0 else 0) for f, g in zip(pf, gs)]
     st = lambda f: sum(1 for g in gs if f(g))
     res = lambda m: 'W' if m['scoreTeam'] > m['scoreOpponent'] else 'D' if m['scoreTeam'] == m['scoreOpponent'] else 'L'
-    return dict(padFlags=pf, pad=pad, big=big(p, ms, gs, T), shots=sh, map=sm, comebacks=comebacks(p, ms, gs), combos=combos(ms), minutes=minutes(gs), ranks=ranks(p), advanced=advanced(p, ms), reach=reach(p, ms), evenness=evenness(anatomy),
+    return dict(gaps=gaps(p, ms), padFlags=pf, pad=pad, big=big(p, ms, gs, T), shots=sh, map=sm, comebacks=comebacks(p, ms, gs), combos=combos(ms), minutes=minutes(gs), ranks=ranks(p), advanced=advanced(p, ms), reach=reach(p, ms), evenness=evenness(anatomy),
                 state3=dict(behind=st(lambda g: g['state'] < 0), level=st(lambda g: g['state'] == 0), ahead=st(lambda g: g['state'] > 0)), inResult={k: sum(m['goals'] for m in ms if res(m) == k) for k in 'WDL'})

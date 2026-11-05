@@ -18,6 +18,8 @@ const SOURCES: [string, string][] = [
   ['Ferguson quote, Football365', 'https://www.football365.com/news/ferguson-messi-would-be-sht-against-stockport'],
   ['League xG, Understat via messivsronaldo.app', 'https://www.messivsronaldo.app/detailed-stats/xg-expected-goals/'],
   ['UEFA Euro 2016 group tables', 'https://en.wikipedia.org/wiki/UEFA_Euro_2016'],
+  ['FIFA World Cup records', 'https://en.wikipedia.org/wiki/FIFA_World_Cup_records_and_statistics'],
+  ['Lionel Messi career and 2016 retirement', 'https://en.wikipedia.org/wiki/Lionel_Messi'],
   ['Understat shot archive, worldfootballR_data', 'https://github.com/JaseZiv/worldfootballR_data/releases/tag/understat_shots'],
   ['Champions League assists, The Analyst', 'https://theanalyst.com/articles/who-has-the-most-champions-league-assists'],
   ['Headed goals record, World Soccer Talk', 'https://worldsoccertalk.com/news/cristiano-ronaldo-closing-the-gap-to-soccers-all-time-heading-record-how-many-more-does-he-need/'],
@@ -42,6 +44,8 @@ export function Method() {
           <p>Shot locations come from Understat through the worldfootballR archive: league shots in England, Spain, Italy and France, 2014-15 to 2022-23. {'That covers 487 of their 1,922 goals, and 485 are matched to the goal list.'} Where a shot crosses the goal line isn't recorded, so the flight paths end at illustrative points in the net.</p>
           <h3>Stat padding</h3>
           <p>A padded goal here means one of four things: a goal in a win by four or more, a league goal against a side in the bottom three at the time, a friendly goal, or a goal against one of his ten most-scored-against opponents. Bottom-three splits cover Spain, England, Italy and France. Opponent counts favour a long stay in one league, and South American nations have no minnow qualifiers, so friendlies fill that gap for Argentina. The same test on Ronaldo is in the cross-examination.</p>
+          <h3>The gaps</h3>
+          <p>Every line comes from the same match logs as the rest of the site, with Ronaldo's figure beside it where one exists. The quarter-final run counts Champions League quarter-final games, 2013 to 2019. Finals lost count senior finals for the national team. Shootout misses come from match reports.</p>
           <h3>Opposition and range</h3>
           <p>UEFA top-club splits cover Champions League matches only, using the fan site's coefficient rankings at the time of each match. Named clubs on the page are examples, and every one we checked is listed under Every number, including those where Messi leads. A decided tie is one his team won and would have lost without his goals. Perfect hat-tricks mean a left-foot, right-foot and headed goal in the same match. Keeper counts use the goal list by batestguy, which runs to July 2026. Foot and head balance is the Shannon evenness of the three counts. Champions League assists use UEFA's list. Opta counts differently, and the logs here give 41 to 40. Bars in each row are scaled to the leader of that row, and rows written as 12 in 34 are scaled by goals per game.</p>
           <h3>Counting disputes</h3>

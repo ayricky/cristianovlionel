@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { gsap, ScrollTrigger, calm } from '../lib/motion'
 import { stage } from '../lib/stage'
 import { viewW, words } from '../lib/shapes'
+import { sound } from '../lib/sound'
 
 /** Lights spell the act's name, then a shockwave clears them. */
 export function Act({ word, id }: { word: string; id: string }) {
@@ -13,7 +14,7 @@ export function Act({ word, id }: { word: string; id: string }) {
     const st = ScrollTrigger.create({
       trigger: root.current, start: 'top 62%', end: 'bottom 38%',
       onToggle: (s) => {
-        if (s.isActive) { stage.enter(key, make, 1.3); setTimeout(() => stage.field?.shock(viewW() / 2, innerHeight / 2), 950) } else stage.leave(key)
+        if (s.isActive) { stage.enter(key, make, 1.3); setTimeout(() => { stage.field?.shock(viewW() / 2, innerHeight / 2); sound.hit(0.6) }, 950) } else stage.leave(key)
       },
     })
     let tw: gsap.core.Tween | undefined

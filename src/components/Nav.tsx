@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { ScrollTrigger } from '../lib/motion'
+import { sound } from '../lib/sound'
 
-const ITEMS = [['case', 'The case'], ['wall', 'Results'], ['cabinet', 'Trophies'], ['nights', 'Big games'], ['film', 'The goals'], ['clutch', 'Clutch'], ['padding', 'Stat padding'], ['feet', 'Feet and head'], ['map', 'The pitch'], ['ages', 'Longevity'], ['country', 'Country'], ['cross', 'Cross-exam'], ['verdict', 'Verdict'], ['numbers', 'Every number'], ['method', 'Method']] as const
+const ITEMS = [['case', 'The case'], ['wall', 'Results'], ['cabinet', 'Trophies'], ['nights', 'Big games'], ['film', 'The goals'], ['clutch', 'Clutch'], ['padding', 'Stat padding'], ['gaps', 'The gaps'], ['feet', 'Feet and head'], ['map', 'The pitch'], ['ages', 'Longevity'], ['country', 'Country'], ['cross', 'Cross-exam'], ['verdict', 'Verdict'], ['numbers', 'Every number'], ['method', 'Method']] as const
 
 export function Nav() {
   const [on, setOn] = useState('')
   const [minute, setMinute] = useState(0)
   const [open, setOpen] = useState(false)
   const [past, setPast] = useState(false)
+  const [audible, setAudible] = useState(false)
+  useEffect(() => sound.subscribe(setAudible), [])
   useEffect(() => {
     const sts = ITEMS.map(([id]) => ScrollTrigger.create({ trigger: `#${id}`, start: 'top 50%', end: 'bottom 50%', onToggle: (s) => s.isActive && setOn(id) }))
     const clock = ScrollTrigger.create({ start: 0, end: 'max', onUpdate: (s) => { setMinute(Math.round(s.progress * 90)); setPast(s.scroll() > innerHeight * 0.7) } })
@@ -21,6 +24,7 @@ export function Nav() {
         <a href="#top" className="mark" aria-label="Back to top">{minute}'</a>
         <ol>{ITEMS.map(([id, l]) => <li key={id}><a href={`#${id}`} className={on === id ? 'on' : ''}><span>{l}</span></a></li>)}</ol>
       </nav>
+      <button className="sound-chip" onClick={() => sound.toggle()} aria-pressed={audible}>{audible ? 'Sound on' : 'Sound'}</button>
       <div className={`sides ${past ? 'show' : ''}`} aria-hidden><span className="r">Ronaldo</span><span className="m">Messi</span></div>
       <div className={`dock ${past ? 'show' : ''}`}>
         <button onClick={() => setOpen(!open)} aria-expanded={open}><b>{minute}'</b><span>{label}</span><i aria-hidden>{open ? 'Close' : 'Menu'}</i></button>

@@ -3,6 +3,7 @@ import { gsap, ScrollTrigger, calm } from '../lib/motion'
 import { stage } from '../lib/stage'
 import { bothDigits, viewW } from '../lib/shapes'
 import { eraseTimeline, P } from '../lib/data'
+import { sound } from '../lib/sound'
 
 const ROWS = [['flips', 'Results changed'], ['wins', 'Wins gone'], ['points', 'Points gone'], ['trophies', 'Trophies gone']] as const
 const make = () => {
@@ -46,7 +47,7 @@ export function Hero() {
     navigator.vibrate?.(12)
     tween.current?.kill()
     stage.field?.setPulse(0.5)
-    tween.current = gsap.to(prog.current, { v: 1, duration: calm() ? 0.01 : (1 - prog.current.v) * 5.5, ease: 'none', onUpdate: apply, onComplete: () => { stage.field?.setPulse(0); stage.field?.shock(viewW() / 2, innerHeight * 0.42); navigator.vibrate?.([30, 40, 60]) } })
+    tween.current = gsap.to(prog.current, { v: 1, duration: calm() ? 0.01 : (1 - prog.current.v) * 5.5, ease: 'none', onUpdate: apply, onComplete: () => { stage.field?.setPulse(0); stage.field?.shock(viewW() / 2, innerHeight * 0.42); sound.hit(); sound.roar(); navigator.vibrate?.([30, 40, 60]) } })
   }
   const release = () => { tween.current?.kill(); stage.field?.setPulse(0) }
   const reset = () => { tween.current?.kill(); tween.current = gsap.to(prog.current, { v: 0, duration: calm() ? 0.01 : 0.9, ease: 'power2.inOut', onUpdate: apply }) }
