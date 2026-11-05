@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ScrollTrigger } from '../lib/motion'
 
-const ITEMS = [['case', 'The case'], ['wall', 'Results'], ['cabinet', 'Trophies'], ['nights', 'Big games'], ['clutch', 'Clutch'], ['padding', 'Stat padding'], ['feet', 'Feet and head'], ['map', 'The pitch'], ['ages', 'Longevity'], ['country', 'Country'], ['cross', 'Cross-exam'], ['verdict', 'Verdict'], ['numbers', 'Every number'], ['method', 'Method']] as const
+const ITEMS = [['case', 'The case'], ['wall', 'Results'], ['cabinet', 'Trophies'], ['nights', 'Big games'], ['film', 'The goals'], ['clutch', 'Clutch'], ['padding', 'Stat padding'], ['feet', 'Feet and head'], ['map', 'The pitch'], ['ages', 'Longevity'], ['country', 'Country'], ['cross', 'Cross-exam'], ['verdict', 'Verdict'], ['numbers', 'Every number'], ['method', 'Method']] as const
 
 export function Nav() {
   const [on, setOn] = useState('')

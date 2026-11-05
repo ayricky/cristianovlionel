@@ -29,7 +29,7 @@ function Race() {
 
 export function Ages() {
   return (
-    <Claim id="ages" title="After 30 he outscored Messi by 150." r={r.after30} m={m.after30} rSub="goals after turning 30" mSub="goals after turning 30" note={<>From 35: <Count to={r.after35} /> to <Count to={m.after35} />. Injury absences to August 2025: 85 matches to 196.</>} clip="damac2026">
+    <Claim id="ages" title="After 30 he outscored Messi by 150." r={r.after30} m={m.after30} rSub="goals after turning 30" mSub="goals after turning 30" note={<>From 35: <Count to={r.after35} /> to <Count to={m.after35} />. Injury absences to August 2025: 85 matches to 196.</>}>
       <Race />
     </Claim>
   )

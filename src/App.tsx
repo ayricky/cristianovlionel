@@ -11,6 +11,7 @@ import { Cabinet } from './components/Cabinet'
 import { Clutch } from './components/Clutch'
 import { Biggest } from './components/Stage'
 import { Case } from './components/Case'
+import { Film } from './components/Film'
 import { Feet } from './components/Feet'
 import { PitchMap } from './components/Map'
 import { Act } from './components/Act'
@@ -53,6 +54,8 @@ export function App() {
         <Cabinet />
         <Act id="biggest" word="BIG GAMES" />
         <Biggest />
+        <Act id="goals" word="THE GOALS" />
+        <Film />
         <Act id="decisive" word="DECISIVE" />
         <Clutch />
         <Act id="padded" word="PADDED" />

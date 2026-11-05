@@ -19,4 +19,14 @@ npm run check:data   # assert 58 headline numbers
 - `src/lib/field.ts`: the WebGL lights. One point per goal. `src/lib/shapes.ts` lays them out, `src/lib/pitch.ts` is the 3D pitch, and `src/components/Story.tsx` pins a chapter and walks its steps.
 - `src/lib/videos.ts`: YouTube clips. `embed: false` means the channel blocks off-site playback, so the card links out.
 
+Live at https://cristianovlionel.ayricky.dev, on the Cloudflare Pages project `cristianovlionel`:
+
+```
+npm run build && secrets run cristianovlionel/cloudflare-pages -- npx wrangler pages deploy dist --project-name cristianovlionel --branch main
+```
+
+Wrangler may offer to migrate the project to Workers and edit `package.json` and `vite.config.ts`. Revert those if it does.
+
+Some video owners block embeds even when YouTube reports them as embeddable. `src/components/Film.tsx` and `src/lib/videos.ts` only mark a clip as embedded after it has played from the live site, so test a new clip there first.
+
 The counting method is on the site's last section.

@@ -1,5 +1,6 @@
 import credits from '../data/credits.json'
 import { CLIPS } from '../lib/videos'
+import { MOMENTS } from './Film'
 
 const SOURCES: [string, string][] = [
   ['Match logs, messivsronaldo.app', 'https://www.messivsronaldo.app/match-histories/ronaldo-match-history/'],
@@ -53,7 +54,7 @@ export function Method() {
           <h3>Photos</h3>
           <ul className="src">{Object.values(credits).map((c) => <li key={c.page}><a href={c.page} target="_blank" rel="noreferrer">{c.artist}, {c.license}</a></li>)}</ul>
           <h3>Video</h3>
-          <p>Clips from {[...new Set(clips.map((c) => c.channel))].join(', ')}, played from YouTube.</p>
+          <p>Clips from {[...new Set([...clips.map((c) => c.channel), ...MOMENTS.map((c) => c.channel)])].join(', ')}, played from YouTube. Nothing is hosted here.</p>
         </div>
       </div>
       <p className="legal">Fan project. Not affiliated with either player, any club, league or federation.</p>
