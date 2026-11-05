@@ -3,3 +3,13 @@ dist
 .cache
 data/raw/football-data
 data/raw/videos
+__pycache__
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+.wrangler
+wrangler.jsonc
