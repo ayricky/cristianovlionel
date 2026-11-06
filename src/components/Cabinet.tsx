@@ -1,8 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { gsap, ScrollTrigger, calm } from '../lib/motion'
-import { stage } from '../lib/stage'
+import { useState } from 'react'
 import { fmtSeason, P, trophies, type Who } from '../lib/data'
-import { Claim } from './Claim'
 
 const Cup = ({ kind }: { kind: string }) => (
   <svg viewBox="0 0 40 48" aria-hidden className="cup">
@@ -12,32 +9,23 @@ const Cup = ({ kind }: { kind: string }) => (
       : <path d="M11 4h18v12c0 7-4 11-7 12v8h6v6H12v-6h6v-8c-3-1-7-5-7-12z" />}
   </svg>
 )
-function Shelf({ who, gone }: { who: Who; gone: boolean }) {
+type T = ReturnType<typeof trophies>[number]
+function Shelf({ who, pick }: { who: Who; pick: (t: T) => void }) {
   return (
-    <div className={`shelf ${who} ${gone ? 'emptied' : ''}`}>
-      {trophies(who).map((t) => <span key={t.comp + t.season} className={`trophy t-${t.status}`} title={`${t.comp} ${fmtSeason(t.season)}: ${t.status}`}><Cup kind={t.kind} /></span>)}
+    <div className={`shelf ${who} emptied`}>
+      {trophies(who).map((t) => <button key={t.comp + t.season} className={`trophy t-${t.status}`} aria-label={`${t.comp} ${fmtSeason(t.season)}`} onMouseEnter={() => pick(t)} onFocus={() => pick(t)} onClick={() => pick(t)}><Cup kind={t.kind} /></button>)}
     </div>
   )
 }
 export function Cabinet() {
-  const [gone, setGone] = useState(calm())
-  const box = useRef<HTMLDivElement>(null)
+  const [t, setT] = useState<T | null>(null)
   const c = { r: P('ronaldo').trophyCount, m: P('messi').trophyCount }
-  useEffect(() => {
-    const go = () => {
-      setGone(true)
-      if (calm()) return
-      const tiles = gsap.utils.toArray<HTMLElement>('.t-gone', box.current!)
-      tiles.filter((_, i) => i % 7 === 0).forEach((t, i) => setTimeout(() => { const b = t.getBoundingClientRect(); stage.field?.shock(b.left + b.width / 2, b.top + b.height / 2) }, 160 + i * 150))
-      gsap.fromTo(tiles, { y: -8, scale: 1.25 }, { y: 0, scale: 1, duration: 0.5, ease: 'bounce.out', stagger: { each: 0.035, from: 'random' } })
-    }
-    const st = ScrollTrigger.create({ trigger: box.current, start: 'top 62%', once: true, onEnter: go })
-    return () => st.kill()
-  }, [])
   return (
-    <Claim id="cabinet" title="More than half his trophies needed his goals." r={Math.round(c.r.gone / c.r.total * 100)} m={Math.round(c.m.gone / c.m.total * 100)} suffix="%" rSub={`${c.r.gone} of ${c.r.total}`} mSub={`${c.m.gone} of ${c.m.total}`}
-      note={`Every league title he won, four of his five Champions Leagues and all three titles with Portugal.`}>
-      <div className="split rise" ref={box}><Shelf who="ronaldo" gone={gone} /><Shelf who="messi" gone={gone} /></div>
-    </Claim>
+    <div className="cabinet">
+      <h3>Trophies that needed his goals</h3>
+      <p className="card-line">Dashed trophies are lost without his goals. Point at one to see why.</p>
+      <div className="split"><div><p className="count"><i className="k r" />Ronaldo, {c.r.gone} of {c.r.total}</p><Shelf who="ronaldo" pick={setT} /></div><div><p className="count"><i className="k m" />Messi, {c.m.gone} of {c.m.total}</p><Shelf who="messi" pick={setT} /></div></div>
+      <p className="detail">{t ? `${t.comp} ${fmtSeason(t.season)}: ${t.why ?? 'Safe without his goals.'}` : '\u00a0'}</p>
+    </div>
   )
 }

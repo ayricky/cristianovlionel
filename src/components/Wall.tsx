@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { gsap, ScrollTrigger, calm } from '../lib/motion'
+import { gsap, calm } from '../lib/motion'
 import { eraseOf, fmtDate, matches, res, teams, type Row, type Who } from '../lib/data'
-import { useRise } from './Bits'
 
 const BASE: Record<Who, string> = { ronaldo: '#5b4522', messi: '#274659' }
 const MOST = Math.max(matches('ronaldo').length, matches('messi').length)
@@ -17,7 +16,7 @@ function OneWall({ who, sweep }: { who: Who; sweep: { e: number } }) {
     if (!c) return
     const W = c.parentElement!.clientWidth, n = rows.length
     const dpr = Math.min(devicePixelRatio, 2)
-    const aim = innerWidth < 700 ? 300 : 460
+    const aim = 230
     const cell = Math.max(3, Math.floor(Math.sqrt((W * aim) / MOST) * 4) / 4)
     const cols = Math.floor(W / cell), h = Math.ceil(n / cols) * cell
     if (c.width !== Math.round(W * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(h * dpr); c.style.height = `${h}px` }
@@ -59,18 +58,17 @@ function OneWall({ who, sweep }: { who: Who; sweep: { e: number } }) {
 export function Wall() {
   const sweep = useRef({ e: 0 })
   const box = useRef<HTMLDivElement>(null)
-  const root = useRef<HTMLElement>(null)
-  useRise(root)
+  const root = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const go = () => { if (calm()) sweep.current.e = 1; else gsap.to(sweep.current, { e: 1, duration: 2.2, ease: 'none' }) }
-    const st = ScrollTrigger.create({ trigger: box.current, start: 'top 60%', once: true, onEnter: go })
-    return () => st.kill()
+    const t = setTimeout(go, 500)
+    return () => clearTimeout(t)
   }, [])
   return (
-    <section id="wall" className="claim" ref={root}>
-      <h2 className="say rise">Take his goals away and {eraseOf(matches('ronaldo')).flips} results change.</h2>
-      <p className="say-note rise">Each square is a match. Lit squares are the ones his goals decided.</p>
-      <div className="split rise" ref={box}><OneWall who="ronaldo" sweep={sweep.current} /><OneWall who="messi" sweep={sweep.current} /></div>
-    </section>
+    <div ref={root} className="wall-panel">
+      <h3>Results his goals changed</h3>
+      <p className="card-line">Each square is a match. Lit squares are the ones his goals decided. Point at one to read it.</p>
+      <div className="split" ref={box}><OneWall who="ronaldo" sweep={sweep.current} /><OneWall who="messi" sweep={sweep.current} /></div>
+    </div>
   )
 }

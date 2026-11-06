@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [react()],
   server: { host: '127.0.0.1', port: 5173, allowedHosts: true },
   preview: { host: '127.0.0.1', allowedHosts: true },
-  build: { chunkSizeWarningLimit: 900 },
+  base: process.env.VITE_BASE ?? '/',
+  build: { chunkSizeWarningLimit: 900, target: 'es2022' },
 })

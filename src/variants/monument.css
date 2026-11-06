@@ -1,0 +1,35 @@
+/* Monument: a tribute. Black, gold, a high-contrast serif, and Ronaldo alone in the hero. */
+@import '@fontsource-variable/bodoni-moda/index.css';
+@import '@fontsource-variable/bodoni-moda/wght-italic.css';
+:root {
+  --bg: #0a0908; --ink: #f4ecdc; --ink-2: #b5aa96; --ink-3: #7c7364; --gold: #d9b45b; --sky: #9a9a9c; --ember: #c9503a; --line: rgb(217 180 91 / .22);
+  --display: 'Bodoni Moda Variable', Georgia, serif; --r: 2px;
+}
+body::before { background: radial-gradient(90% 60% at 50% 0%, #1b1509, var(--bg) 70%); }
+body::after { display: none; }
+h1 { font: italic 500 clamp(26px, 4.4vw, 66px)/1.05 var(--display); text-transform: none; letter-spacing: 0; font-stretch: 100%; }
+h2, .poster-line h2, .film-head h3 { font-family: var(--display); font-weight: 500; font-style: italic; font-stretch: 100%; text-transform: none; letter-spacing: -.01em; }
+h2 em { background: linear-gradient(90deg, #f0d48a, #b98e2e); -webkit-background-clip: text; background-clip: text; }
+.say { font: italic 500 clamp(27px, 4.2vw, 50px)/1.14 var(--display); letter-spacing: 0; }
+.say-note, .lede { font-family: var(--body); }
+.num b, .case li b, .wall-big b, .vs-num b, .tally dd, .tank-l b, .film-swap, .swap, .mv, .pl b, .ptag b { font-family: var(--display); font-weight: 700; font-stretch: 100%; font-style: normal; }
+.num > b { color: var(--gold) !important; }
+.num.m > b { color: var(--ink-3) !important; }
+.claim.bad .num.m > b { color: var(--ember) !important; }
+.hero-photo.l { width: 100%; }
+.hero-photo.x, .hero-names { display: none; }
+.hero-photo.l::after { background: linear-gradient(180deg, #e0b45a, #8a6a2a 58%, #0a0908); }
+.hero-photo img { filter: grayscale(1) contrast(1.15) brightness(.95); }
+.hero-photo.l img { object-position: 50% 8%; -webkit-mask-image: none; mask-image: none; }
+.hero::after { border-color: var(--line); }
+.tally { background: rgb(10 9 8 / .72); border: 1px solid var(--line); }
+.hold { background: linear-gradient(180deg, #f0d48a, #b98e2e); color: #1a1205; border-radius: 2px; font: 600 15px var(--body); letter-spacing: .14em; }
+.vs-side > i { height: 2px !important; opacity: 1; border-radius: 0 !important; }
+.poster img { filter: grayscale(1) contrast(1.14) brightness(.86); }
+.poster::after { background: linear-gradient(180deg, rgb(10 9 8 / .4), transparent 40%, rgb(10 9 8 / .96)); }
+.poster-line h2 { color: #f0d48a; }
+.leg-row { font-family: var(--display); font-style: italic; font-weight: 500; font-stretch: 100%; text-transform: none; -webkit-text-stroke: 1px rgb(217 180 91 / .4); }
+.leg-row .solid { color: #e7c777; }
+.film-frame { box-shadow: 0 0 0 1px var(--line), 0 40px 90px #000; }
+.sides { letter-spacing: .3em; }
+.claim { gap: clamp(18px, 3vh, 32px); }

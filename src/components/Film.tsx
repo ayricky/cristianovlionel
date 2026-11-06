@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { gsap, calm } from '../lib/motion'
-import { stage } from '../lib/stage'
-import { viewW } from '../lib/shapes'
+import { calm } from '../lib/motion'
 import { sound } from '../lib/sound'
+import { still, stillFallback } from '../lib/videos'
 
 /** Seconds the still holds over a started clip, which is how long YouTube shows its start-up overlay. */
 const LEAD_IN = 3
@@ -58,9 +57,7 @@ function Scene({ m, n }: { m: Moment; n: number }) {
     return () => { clearInterval(every); clearTimeout(first); clearTimeout(off); setFlip(false) }
   }, [playing])
   useEffect(() => {
-    // Phones stack scenes, so only the one crossing the middle of the screen plays.
-    const stacked = innerWidth <= 640
-    const io = new IntersectionObserver(([e]) => setOn(e.isIntersecting), stacked ? { rootMargin: '-42% 0px -42% 0px', threshold: 0 } : { threshold: 0.55 })
+    const io = new IntersectionObserver(([e]) => setOn(e.isIntersecting), { threshold: 0.55 })
     io.observe(frame.current!)
     return () => io.disconnect()
   }, [])
@@ -68,9 +65,6 @@ function Scene({ m, n }: { m: Moment; n: number }) {
     if (!on) return
     if (!fired.current && !calm()) {
       fired.current = true
-      stage.field?.shock(viewW() / 2, innerHeight / 2)
-      sound.whistle()
-      gsap.fromTo(frame.current, { scale: 0.86, y: 30 }, { scale: 1, y: 0, duration: 0.9, ease: 'expo.out' })
     }
     if (calm()) return
     let dead = false, tried = false, reveal = 0
@@ -89,7 +83,7 @@ function Scene({ m, n }: { m: Moment; n: number }) {
         playerVars: { autoplay: 1, mute: 1, controls: 0, disablekb: 1, playsinline: 1, rel: 0, modestbranding: 1, start: from, fs: 0, iv_load_policy: 3, cc_load_policy: 0 },
         events: {
           onReady: (e: any) => { sound.on ? e.target.unMute() : e.target.mute(); e.target.playVideo() },
-          onError: (e: any) => { if (!tried) { tried = true; setTimeout(() => { if (!dead) e.target.loadVideoById({ videoId: m.id, startSeconds: from }) }, 1200) } },
+          onError: (e: any) => { if (tried) return; tried = true; setTimeout(() => { if (!dead) e.target.loadVideoById({ videoId: m.id, startSeconds: from }) }, 1200) },
           onStateChange: (e: any) => {
             if (e.data === YT.PlayerState.PLAYING && !reveal) reveal = window.setTimeout(() => setPlaying(true), LEAD_IN * 1000)
             if (e.data === YT.PlayerState.ENDED) { e.target.seekTo(from, true); e.target.playVideo() }
@@ -115,7 +109,7 @@ function Scene({ m, n }: { m: Moment; n: number }) {
           <h3>{m.title}</h3>
         </header>
         <div className="film-frame" ref={frame}>
-          <img src={`https://i.ytimg.com/vi/${m.id}/hqdefault.jpg`} alt="" loading="lazy" className={playing ? 'gone' : ''} />
+          <img src={still(m.id)} onLoad={stillFallback} alt="" className={playing ? 'gone' : ''} />
           <div className="film-host" />
         </div>
         <footer className="film-foot">
@@ -133,5 +127,18 @@ function Scene({ m, n }: { m: Moment; n: number }) {
 }
 
 export function Film() {
-  return <div id="film">{MOMENTS.map((m, i) => <Scene key={m.id} m={m} n={i + 1} />)}</div>
+  const [i, setI] = useState(0)
+  const strip = useRef<HTMLOListElement>(null)
+  useEffect(() => {
+    const row = strip.current!, chip = row.children[i] as HTMLElement
+    row.scrollTo({ left: chip.offsetLeft - (row.clientWidth - chip.offsetWidth) / 2, behavior: 'smooth' })
+  }, [i])
+  return (
+    <div id="film">
+      <Scene key={MOMENTS[i].id} m={MOMENTS[i]} n={i + 1} />
+      <ol className="film-strip" ref={strip}>
+        {MOMENTS.map((m, k) => <li key={m.id}><button className={k === i ? 'on' : ''} aria-current={k === i} onClick={() => setI(k)}><b>{m.year}</b><span>{m.title}</span></button></li>)}
+      </ol>
+    </div>
+  )
 }

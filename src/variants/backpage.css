@@ -1,0 +1,50 @@
+/* Back Page: a tabloid. Newsprint, black ink, red, and headlines that shout. */
+@import '@fontsource/anton/index.css';
+:root {
+  --bg: #0d0b0b; --ink: #f7f1e4; --ink-2: #cfc6b4; --ink-3: #8a8275; --gold: #e3121c; --sky: #f7f1e4; --ember: #e3121c; --line: rgb(247 241 228 / .2);
+  --display: 'Anton', Impact, sans-serif; --r: 0px; --paper: #f1eadb; --news: #141111;
+}
+body::before { background: var(--bg); }
+body::after { display: none; }
+.masthead { position: relative; z-index: 3; width: 100%; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 3px double var(--ink); padding-bottom: 4px; margin-bottom: 8px; font: 400 clamp(28px, 6vw, 56px)/1 var(--display); text-transform: uppercase; padding-right: 74px; }
+.masthead span { font: 700 11px var(--body); letter-spacing: .14em; }
+h1 { margin-top: 0; font: 400 clamp(40px, 9.4vw, 128px)/.98 var(--display); font-stretch: 100%; text-transform: uppercase; letter-spacing: 0; transform: rotate(-1.2deg); background: var(--ember); color: #fff; padding: 4px 14px; }
+h2, .poster-line h2, .film-head h3 { font-family: var(--display); font-weight: 400; font-style: normal; font-stretch: 100%; text-transform: uppercase; letter-spacing: .005em; }
+h2 em { background: none; color: var(--ember); -webkit-text-fill-color: var(--ember); }
+.hero-photo img { filter: grayscale(1) contrast(1.5) brightness(.8); }
+.hero-photo::after { background: linear-gradient(180deg, #d8d2c8, #6e6a64 62%, #0d0b0b) !important; }
+.hero-names .r, .sides .r { color: #fff; }
+.claim, .case { background: var(--paper); color: var(--news); max-width: none; border-bottom: 4px solid var(--news); position: relative; z-index: 3; }
+.claim > *, .case > * { max-width: 760px; margin-inline: auto; }
+.say { font: 400 clamp(34px, 7vw, 76px)/1.02 var(--display); text-transform: uppercase; letter-spacing: 0; transform: rotate(-.6deg); color: var(--news); }
+.say-note { color: #4a4238; font-weight: 600; }
+.num b, .case li b, .wall-big b, .tally dd, .tank-l b, .vs-num b, .film-swap, .swap, .mv, .pl b, .ptag b { font-family: var(--display); font-weight: 400; font-stretch: 100%; font-style: normal; }
+.num > b { color: #8d8577 !important; }
+.num.lead > b, .claim.bad .num.r > b { color: var(--news) !important; }
+.claim.bad .num.m > b, .num.r.lead > b { color: var(--ember) !important; }
+.num.r > span, .num.m > span { color: var(--news); text-transform: uppercase; }
+.num > small { color: #4a4238; }
+.case li { border-color: #14111133; color: var(--news); }
+.case li b.r { color: var(--ember); } .case li b.m { color: #8d8577; }
+.wall-big b.r { color: var(--ember); } .wall-big b.m { color: #8d8577; } .wall-big span, .wall-tip { color: #4a4238; }
+.dots.r { --c: var(--ember); } .dots.m { --c: #141111; }
+.claim.bad .dots.m { --c: #141111; }
+.falls li { border-color: #14111133; } .falls span { color: #4a4238; } .tie-list span { color: #4a4238; }
+.shelf.ronaldo .cup { fill: var(--ember); } .shelf.messi .cup { fill: #141111; } .emptied .t-gone .cup { stroke: #8d8577; }
+.legend { color: #4a4238; }
+.poster img { filter: grayscale(1) contrast(1.35); }
+.poster::after { background: linear-gradient(180deg, transparent 50%, rgb(0 0 0 / .86)); }
+.poster-line { text-align: left; }
+.poster-line h2 { display: inline; background: var(--ember); color: #fff; padding: .05em .22em; box-decoration-break: clone; -webkit-box-decoration-break: clone; line-height: 1.32; text-shadow: none; }
+.poster-line p { color: #fff; }
+.leg-row { font-family: var(--display); font-style: normal; font-weight: 400; font-stretch: 100%; -webkit-text-stroke: 1px var(--ink-3); }
+.leg-row .solid { color: var(--ember); }
+.hold { background: var(--ember); color: #fff; border-radius: 0; font: 400 19px var(--display); letter-spacing: .03em; }
+.hold .fill { background: #fff; mix-blend-mode: difference; }
+.film { background: var(--bg); border-bottom: 4px solid var(--ember); }
+.film-head h3 { color: var(--ink); }
+.film-head p b { color: var(--ember); }
+.film-frame { border: 4px solid var(--ink); border-radius: 0; }
+.dock button, .dock b, .sound-chip { border-radius: 0; }
+.year .say { color: var(--ink); }
+.year .say-note { color: var(--ink-2); }

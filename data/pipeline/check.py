@@ -19,6 +19,7 @@ facts = [
  (r['big']['tiesDecided'], 11), (m['big']['tiesDecided'], 6), (r['big']['koHats'], 4), (m['big']['koHats'], 2), (r['big']['koLate'], 4), (m['big']['koLate'], 0),
  (r['big']['semisFinals']['goals'], 31), (m['big']['semisFinals']['goals'], 19), (r['big']['intlTop10']['goals'], 14), (m['big']['intlTop10']['goals'], 7), (r['big']['giants']['Bayern Munich']['goals'], 9), (m['big']['giants']['Bayern Munich']['goals'], 4),
  (m['gaps']['qfDrought'], 12), (r['gaps']['qfDrought'], 3), (m['gaps']['natFinalsLost'], 5), (m['gaps']['natLostGoals'], 0), (r['gaps']['natFinalsLost'], 1), (m['gaps']['wcPensMissed'], 4), (r['gaps']['wcPensMissed'], 1),
+ (r['ballon']['clasicos2012']['goals'], 7), (m['ballon']['clasicos2012']['goals'], 4), (r['ballon']['clasicos2012']['scoredIn'], 6), (m['ballon']['clasicos2012']['scoredIn'], 3), (r['ballon']['2012']['goals'], 59), (m['ballon']['2012']['goals'], 82), (r['ballon']['2019']['winners'], 8), (m['ballon']['2019']['winners'], 7), (r['ballon']['2018']['goals'], 44),
  (r['anatomy']['left'] + r['anatomy']['right'] + r['anatomy']['head'] + r['anatomy']['other'], 985),
  (m['anatomy']['left'] + m['anatomy']['right'] + m['anatomy']['head'] + m['anatomy']['other'], 937),
 ]

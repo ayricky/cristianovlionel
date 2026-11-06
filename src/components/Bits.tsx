@@ -11,6 +11,7 @@ export function Count({ to, decimals = 0, suffix = '', className }: { to: number
   const text = to.toLocaleString('en-GB', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix
   useEffect(() => {
     if (live) return
+    if (el.current!.getBoundingClientRect().top < innerHeight) { const t = setTimeout(() => setLive(true), 60); return () => clearTimeout(t) }
     const st = ScrollTrigger.create({ trigger: el.current, start: 'top 94%', once: true, onEnter: () => setLive(true) })
     return () => st.kill()
   }, [])
@@ -44,18 +45,12 @@ export function useScene(ref: React.RefObject<HTMLElement | null>, key: string, 
   }, [])
 }
 
-/** Headlines wipe on behind a travelling bar. Blocks rise. Coloured chapters open along a slant. */
+/** Blocks rise when the slide appears. */
 export function useRise(ref: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     if (calm()) return
     const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>('.rise', ref.current!).forEach((n) => {
-        gsap.from(n, { y: 40, autoAlpha: 0, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: n, start: 'top 90%', once: true } })
-      })
-      gsap.utils.toArray<HTMLElement>('.slam', ref.current!).forEach((n) => {
-        const tl = gsap.timeline({ scrollTrigger: { trigger: n, start: 'top 84%', once: true } })
-        tl.fromTo(n, { clipPath: 'inset(-10% 100% -10% 0)', skewX: -10 }, { clipPath: 'inset(-10% -5% -10% 0)', skewX: 0, duration: 0.85, ease: 'expo.inOut' })
-      })
+      gsap.from(gsap.utils.toArray<HTMLElement>('.rise', ref.current!), { y: 40, autoAlpha: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06 })
     }, ref)
     return () => ctx.revert()
   }, [])
@@ -72,8 +67,9 @@ export function Exhibit({ id, children, tone, sectionRef }: { id: string; childr
   )
 }
 
-export function Clips({ children }: { children: ReactNode }) {
-  return <div className="clips rise">{children}</div>
+/** Reference material, shut until someone wants it. */
+export function Fold({ title, children }: { title: string; children: ReactNode }) {
+  return <details className="fold" onToggle={() => ScrollTrigger.refresh()}><summary><h2>{title}</h2></summary>{children}</details>
 }
 
 /* All rows share one observer. */
@@ -89,7 +85,7 @@ export function useInView<T extends Element>() {
 }
 
 /** The number a bar should measure: Count's target, a plain number, or "12 in 34" as a rate. */
-function numeric(n: ReactNode): number {
+export function numeric(n: ReactNode): number {
   if (typeof n === 'number') return n
   if (typeof n === 'string') {
     const rate = n.match(/([\d.,]+) (?:in|of) ([\d.,]+)/)
@@ -114,6 +110,35 @@ function chars(n: ReactNode): number {
     return Children.toArray(p.children).reduce<number>((t, c) => t + chars(c), 0)
   }
   return 0
+}
+
+export interface Stat { k: string; r: string | number; m: string | number; note?: string; low?: boolean; plain?: boolean }
+
+/** One line of a table: the two values with a small mirrored bar. The better value is bold. `low` means lower is better, `plain` means neither is. */
+export function StatRow({ k, r, m, note, low, plain }: Stat) {
+  const a = numeric(r), b = numeric(m), top = Math.max(a, b) || 1
+  const better = plain || a === b ? 0 : (low ? a < b : a > b) ? 1 : 2
+  return (
+    <div className="st" role="row">
+      <div className="st-k" role="rowheader">{k}{low && <em>lower is better</em>}{note && <small>{note}</small>}</div>
+      <b className={`st-v ${better === 1 ? 'win' : ''}`} role="cell">{r}</b>
+      <div className="st-bar" aria-hidden><i className="l" style={{ width: `${(a / top) * 50}%` }} /><i className="x" style={{ width: `${(b / top) * 50}%` }} /></div>
+      <b className={`st-v ${better === 2 ? 'win' : ''}`} role="cell">{m}</b>
+    </div>
+  )
+}
+
+export function Rows({ rows }: { rows: Stat[] }) {
+  return (
+    <div className="st-table" role="table">
+      <div className="st head" role="row"><span /><span className="st-v"><i className="k r" />Ronaldo</span><span /><span className="st-v"><i className="k m" />Messi</span></div>
+      {rows.map((s) => <StatRow key={s.k} {...s} />)}
+    </div>
+  )
+}
+
+export function Part({ id, title, children }: { id: string; title: string; children: ReactNode }) {
+  return <section id={id} className="part"><h2>{title}</h2>{children}</section>
 }
 
 /** Mirror bars growing out from the halfway line. Ronaldo left, Messi right. */

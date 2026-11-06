@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { calm } from './motion'
-import { Pitch, type ShotRow } from './pitch'
+import { LIGHTS, VARIANT } from './variant'
 
 /**
  * Every goal either player scored, drawn as one light. The lights hold a shape (digits, unit charts) and
@@ -65,7 +65,7 @@ void main() {
   if (r > 1.0) discard;
   float core = smoothstep(0.6, 0.12, r);
   float halo = pow(1.0 - r, 1.8) * 0.6;
-  vec3 gold = vec3(1.0, 0.745, 0.2); vec3 sky = vec3(0.45, 0.82, 1.0); vec3 ember = vec3(1.0, 0.33, 0.14);
+  vec3 gold = vec3(${LIGHTS[VARIANT].r}); vec3 sky = vec3(${LIGHTS[VARIANT].m}); vec3 ember = vec3(${LIGHTS[VARIANT].hot});
   vec3 c = mix(gold, sky, vWho);
   c = mix(c, vec3(1.0, 0.98, 0.92), core * 0.28 + min(vHot, 1.0) * 0.72);
   if (vHot > 1.5) c = mix(ember, vec3(1.0, 0.86, 0.7), core * 0.5);
@@ -93,15 +93,13 @@ export class GoalField {
   private mixDur = 0
   private sizeTarget = 2.6
 
-  pitch: Pitch
   private shockT = 1
 
   private nM: number
 
-  constructor(canvas: HTMLCanvasElement, nR: number, nM: number, shots: ShotRow[]) {
+  constructor(canvas: HTMLCanvasElement, nR: number, nM: number) {
     this.n = nR + nM
     this.nM = nM
-    this.pitch = new Pitch(shots)
     const gl = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' })
     gl.setClearColor(0, 0)
     gl.autoClear = false
@@ -127,7 +125,7 @@ export class GoalField {
       uniforms: {
         uMix: { value: 1 }, uTime: { value: 0 }, uDpr: { value: 1 }, uSize: { value: 2.6 }, uEraseR: { value: 0 }, uEraseM: { value: 0 }, uFall: { value: 900 },
         uPulse: { value: 0 }, uOffFrom: { value: 0 }, uOffTo: { value: 0 }, uAnchorFrom: { value: 0 }, uAnchorTo: { value: 0 },
-        uRes: { value: new THREE.Vector2(1, 1) }, uPointer: { value: this.pointer }, uVP: { value: this.pitch.vp }, uWorldFrom: { value: 0 }, uWorldTo: { value: 0 }, uShock: { value: new THREE.Vector3(0, 0, 1) }, uPanelR: { value: new THREE.Vector4(0, 0, 1, 1) }, uPanelM: { value: new THREE.Vector4(0, 0, 1, 1) },
+        uRes: { value: new THREE.Vector2(1, 1) }, uPointer: { value: this.pointer }, uVP: { value: new THREE.Matrix4() }, uWorldFrom: { value: 0 }, uWorldTo: { value: 0 }, uShock: { value: new THREE.Vector3(0, 0, 1) }, uPanelR: { value: new THREE.Vector4(0, 0, 1, 1) }, uPanelM: { value: new THREE.Vector4(0, 0, 1, 1) },
       },
     })
     const pts = new THREE.Points(this.geo, this.mat)
@@ -147,20 +145,11 @@ export class GoalField {
     this.mat.uniforms.uDpr.value = dpr
     this.mat.uniforms.uRes.value.set(w, h)
     this.mat.uniforms.uFall.value = h * 1.2
-    this.pitch.setSize(w, h, dpr)
   }
 
   setPointer(x: number, y: number) { this.pointer.set(x, y) }
   setErase(w: 'ronaldo' | 'messi', v: number) { this.mat.uniforms[w === 'ronaldo' ? 'uEraseR' : 'uEraseM'].value = v }
   setPulse(v: number) { this.mat.uniforms.uPulse.value = v }
-  /** Give each player a rectangle of the viewport for the 3D pitch. */
-  setPanels(r: [number, number, number, number], m: [number, number, number, number]) {
-    const u = this.mat.uniforms
-    u.uPanelR.value.set(...r); u.uPanelM.value.set(...m)
-    this.panels = [r, m]
-    this.pitch.setAspect(r[2] / r[3])
-  }
-  private panels: [number, number, number, number][] = []
 
   /** Shockwave through the lights from a viewport point. */
   shock(x: number, y: number) { if (calm()) return; this.mat.uniforms.uShock.value.set(x, y, 0); this.shockT = performance.now() }
@@ -198,17 +187,9 @@ export class GoalField {
     if (!s) return -1
     const off = s.anchored ? this.scrollY - this.anchorY : 0
     let best = -1, bd = radius * radius
-    const e = this.pitch.vp.elements
     for (let i = 0; i < this.n; i++) {
       if (s.alpha[i] < 0.3) continue
       let px = s.pos[i * 2], py = s.pos[i * 2 + 1] - off
-      if (s.world) {
-        const a = s.world[i * 3], b = s.world[i * 3 + 1], c = s.world[i * 3 + 2]
-        const w = e[3] * a + e[7] * b + e[11] * c + e[15]
-        const pn = this.panels[i < this.n - this.nM ? 0 : 1]
-        px = pn[0] + ((e[0] * a + e[4] * b + e[8] * c + e[12]) / w * 0.5 + 0.5) * pn[2]
-        py = pn[1] + (0.5 - (e[1] * a + e[5] * b + e[9] * c + e[13]) / w * 0.5) * pn[3]
-      }
       const dx = px - x, dy = py - y
       const d = dx * dx + dy * dy
       if (d < bd) { bd = d; best = i }
@@ -227,21 +208,9 @@ export class GoalField {
     }
     u.uSize.value += (this.sizeTarget - u.uSize.value) * 0.08
     if (u.uShock.value.z < 1) u.uShock.value.z = Math.min(1, (t - this.shockT) / 1500)
-    this.pitch.update(u.uTime.value)
     this.scrollY = window.scrollY
     u.uOffTo.value = this.scrollY - this.anchorY
     this.renderer.clear()
-    if (this.pitch.visible && this.panels.length) {
-      const gl = this.renderer, H = u.uRes.value.y
-      gl.setScissorTest(true)
-      this.panels.forEach(([x, y, w, h], i) => {
-        gl.setViewport(x, H - y - h, w, h); gl.setScissor(x, H - y - h, w, h)
-        this.pitch.setWho(i === 0 ? 1 : 0, i === 0 ? 0 : 1)
-        gl.render(this.pitch.scene, this.pitch.camera)
-      })
-      gl.setScissorTest(false)
-      gl.setViewport(0, 0, u.uRes.value.x, H)
-    }
     this.renderer.render(this.scene, this.cam)
   }
 

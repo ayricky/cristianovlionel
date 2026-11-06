@@ -1,13 +1,16 @@
+import { img } from '../lib/variant'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, calm } from '../lib/motion'
 import { stage } from '../lib/stage'
-import { bothDigits, viewW } from '../lib/shapes'
+import { bothDigits, digits, viewW } from '../lib/shapes'
+import { VARIANT } from '../lib/variant'
 import { eraseTimeline, P } from '../lib/data'
 import { sound } from '../lib/sound'
 
 const ROWS = [['flips', 'Results changed'], ['wins', 'Wins gone'], ['points', 'Points gone'], ['trophies', 'Trophies gone']] as const
 const make = () => {
   const W = viewW(), H = innerHeight, wide = W > 800
+  if (VARIANT === 'monument') return digits('ronaldo', Math.min(W * 0.86, H * 1.05), W / 2, H * (wide ? 0.52 : 0.5))
   const y = H * (wide ? 0.42 : 0.36)
   return bothDigits({ ronaldo: [W * 0.26, y], messi: [W * 0.74, y] }, W * (wide ? 0.42 : 0.46))
 }
@@ -58,8 +61,9 @@ export function Hero() {
   const done = value >= 1
   return (
     <section className="hero" ref={root} id="top">
-      <div className="hero-photo l" aria-hidden><img src="/img/r-2026.jpg" alt="" /></div>
-      <div className="hero-photo x" aria-hidden><img src="/img/m-2022.jpg" alt="" /></div>
+      {VARIANT === 'backpage' && <p className="masthead">The 985 <span>Final edition</span></p>}
+      <div className="hero-photo l" aria-hidden><img src={img("r-2026.jpg")} alt="" /></div>
+      <div className="hero-photo x" aria-hidden><img src={img("m-2022.jpg")} alt="" /></div>
       <h1><span className="clip"><span className="hero-word">Take</span></span> <span className="clip"><span className="hero-word">their</span></span> <span className="clip"><span className="hero-word">goals</span></span> <span className="clip"><span className="hero-word">away</span></span></h1>
       <div className="hero-names" aria-hidden><span className="r">Ronaldo</span><span className="m">Messi</span></div>
       <div className="hero-spacer" aria-hidden />
